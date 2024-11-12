@@ -2,8 +2,9 @@
 
 namespace iutnc\hellokant\model;
 
-class Model
-{
+use iutnc\hellokant\query\Query;
+
+class Model{
     protected static $table;
     protected static $idColumn = 'id';
 
@@ -20,5 +21,36 @@ class Model
 
     public function __set(string $name, mixed $val): void{
         $this->atts[$name] = $val;
+    }
+
+    public function delete(){
+        if ($this->atts[static::$idColumn] === null){
+            throw new \Exception('No id set for this model');
+        }
+
+        return Query::table(static::$table)
+            ->where(static::$idColumn, '=', $this->atts[static::$idColumn])
+            ->delete();
+    }
+
+    public function insert(){
+        return Query::table(static::$table)
+            ->insert($this->atts);
+    }
+
+    public static function all() : array {
+        $all = Query::table(static::$table)->get();
+        $return=[];
+        foreach( $all as $m) {
+            $return[] = new static($m);
+        }
+        return $return;
+    }
+
+    public function find(int $id) : array {
+        $m = Query::table(static::$table)
+            ->where(static::$idColumn, '=', $id)
+            ->get();
+        return $m;
     }
 }
