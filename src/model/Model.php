@@ -48,9 +48,20 @@ class Model{
     }
 
     public function find(int $id) : array {
+        //1ère méthode
         $m = Query::table(static::$table)
             ->where(static::$idColumn, '=', $id)
             ->get();
         return $m;
+
+        //2ème méthode
+        /*
+        $colone = $t[0];
+        $operateur = $t[1];
+        $valeur = $t[2];
+        $m = Query::table(static::$table)
+            ->where($colone, $operateur, $valeur)
+            ->get();
+        */
     }
 }

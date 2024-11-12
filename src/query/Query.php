@@ -1,5 +1,5 @@
 <?php
-namespace iutnc\hellokant\querry;
+namespace iutnc\hellokant\query;
 
 class Query
 {
