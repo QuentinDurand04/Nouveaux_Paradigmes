@@ -5,7 +5,7 @@ namespace iutnc\hellokant\database;
 use PDO;
 use PDOException;
 
-class Connection
+class ConnectionFactory
 {
     private static ?PDO $pdo = null;
 

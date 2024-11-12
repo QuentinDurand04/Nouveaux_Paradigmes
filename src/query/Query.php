@@ -1,6 +1,9 @@
 <?php
 namespace iutnc\hellokant\query;
 
+use iutnc\hellokant\database\Connection;
+use iutnc\hellokant\database\ConnectionFactory;
+
 class Query
 {
     private $sqltable;
@@ -19,27 +22,40 @@ class Query
         return $query;
     }
 
-    public function where(string $col, string $op, mixed $val): Query
+    public function where(string $col, string $op, $val): Query
     {
-        if ($this->where) {
-            $this->where .= ' AND ';
-        } else {
-            $this->where = ' WHERE ';
-        }
-        $this->where .= "$col $op ?";
-        $this->args[] = $val;
+        if (!is_null($this->where)) $this->where = ' and ';
+        $this->where .= ' ' . $col . ' ' . $op . ' ? ';
+        $this->args[]=$val;
+        return $this;
+    }
+
+    public function orWhere(string $col, string $op, $val): Query
+    {
+        if (!is_null($this->where)) $this->where = ' or ';
+        $this->where .= ' ' . $col . ' ' . $op . ' ? ';
+        $this->args[]=$val;
         return $this;
     }
 
 
     public function get(): array
     {
-        $this->sql = 'select ' . $this->fields .
-            ' from ' . $this->sqltable;
+        $this->sql = 'select ' . $this->fields . ' from ' . $this->sqltable;
+
+        if (!is_null($this->where))
+            $this->sql .= ' where '.$this->where;
+
+        $pdo = ConnectionFactory::getConnection();
         /* … */
         $stmt = $pdo->prepare($this->sql);
         $stmt->execute($this->args);
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        var_dump($this->sql);
+        var_dump($this->args);
+
+        return [];
     }
 
     public function select(array $fields): Query
