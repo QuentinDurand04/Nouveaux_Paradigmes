@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  php:
+    image: php:7.4-apache
+    container_name: php
+    ports:
+      - "8080:80"
+    volumes:
+      - ./src:/var/www/html
+
+  db:
+    image: postgres:13
+    container_name: postgres
+    environment:
+      POSTGRES_DB: hellokant.db
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+    ports:
+      - "5432:5432"
+
+  adminer:
+    image: adminer
+    container_name: adminer
+    ports:
+      - "8081:8080"
