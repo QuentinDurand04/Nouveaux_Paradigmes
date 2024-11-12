@@ -1,0 +1,14 @@
+{
+
+  "require" : {
+    "php": ">=8.2",
+    "ramsey/uuid": "^4.7"
+
+  },
+  
+  "autoload": {
+    "psr-4" : {
+      "iutnc\\hellokant\\" : "./src"
+    }
+  }
+}
