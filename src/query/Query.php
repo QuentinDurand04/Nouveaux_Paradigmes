@@ -9,10 +9,13 @@ class Query
     private $args = [];
     private $sql = '';
 
+    private function __construct(string $table){
+        $this->sqltable = $table;
+    }
+
     public static function table(string $table): Query
     {
-        $query = new Query;
-        $query->sqltable = $table;
+        $query = new Query($table);
         return $query;
     }
 
