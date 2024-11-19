@@ -10,12 +10,11 @@ services:
       - ./src:/var/www/html
 
   db:
-    image: postgres:13
-    container_name: postgres
+    image: mysql:latest
+    container_name: mysql
     environment:
-      POSTGRES_DB: hellokant.db
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: root
+      MYSQL_DB: hellokant
+      MYSQL_ROOT_PASSWORD: root
     ports:
       - "5432:5432"
 
