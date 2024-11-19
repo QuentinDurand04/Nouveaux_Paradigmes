@@ -20,7 +20,7 @@ class ConnectionFactory
     {
         if (self::$pdo === null) {
             try {
-                $dsn = "mysql:host={$conf['host']};dbname={$conf['dbname']};charset={$conf['charset']}";
+                $dsn = "postgresql:host={$conf['host']};dbname={$conf['dbname']};charset={$conf['charset']}";
                 self::$pdo = new PDO(
                     $dsn,
                     $conf['username'],
