@@ -1,6 +1,6 @@
 <?php
 
-namespace iutnc\hellokant\database;
+namespace iutnc\hellokant;
 
 use PDO;
 use PDOException;

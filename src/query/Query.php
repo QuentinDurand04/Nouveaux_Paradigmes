@@ -1,61 +1,69 @@
 <?php
 namespace iutnc\hellokant\query;
 
-use iutnc\hellokant\database\Connection;
-use iutnc\hellokant\database\ConnectionFactory;
+use iutnc\hellokant\ConnectionFactory;
+use PDO;
+use PDOException;
 
 class Query
 {
-    private $sqltable;
-    private $fields = '*';
-    private $where = null;
-    private $args = [];
-    private $sql = '';
+    private string $sqltable;
+    private string $fields = '*';
+    private ?string $where = null;
+    private array $args = [];
+    private string $sql = '';
 
-    private function __construct(string $table){
+    private function __construct(string $table)
+    {
         $this->sqltable = $table;
     }
 
     public static function table(string $table): Query
     {
-        $query = new Query($table);
-        return $query;
+        return new Query($table);
     }
 
     public function where(string $col, string $op, $val): Query
     {
-        if (!is_null($this->where)) $this->where = ' and ';
-        $this->where .= ' ' . $col . ' ' . $op . ' ? ';
-        $this->args[]=$val;
+        if (!is_null($this->where)) {
+            $this->where .= ' AND ';
+        } else {
+            $this->where = '';
+        }
+        $this->where .= " $col $op ? ";
+        $this->args[] = $val;
         return $this;
     }
 
     public function orWhere(string $col, string $op, $val): Query
     {
-        if (!is_null($this->where)) $this->where = ' or ';
-        $this->where .= ' ' . $col . ' ' . $op . ' ? ';
-        $this->args[]=$val;
+        if (!is_null($this->where)) {
+            $this->where .= ' OR ';
+        } else {
+            $this->where = '';
+        }
+        $this->where .= " $col $op ? ";
+        $this->args[] = $val;
         return $this;
     }
 
-
     public function get(): array
     {
-        $this->sql = 'select ' . $this->fields . ' from ' . $this->sqltable;
+        $this->sql = 'SELECT ' . $this->fields . ' FROM ' . $this->sqltable;
 
-        if (!is_null($this->where))
-            $this->sql .= ' where '.$this->where;
+        if (!is_null($this->where)) {
+            $this->sql .= ' WHERE ' . $this->where;
+        }
 
         $pdo = ConnectionFactory::getConnection();
-        /* … */
         $stmt = $pdo->prepare($this->sql);
-        $stmt->execute($this->args);
-        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
-        var_dump($this->sql);
-        var_dump($this->args);
-
-        return [];
+        try {
+            $stmt->execute($this->args);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            throw new PDOException("Erreur lors de l'exécution de la requête SELECT : " . $e->getMessage());
+        }
     }
 
     public function select(array $fields): Query
@@ -67,34 +75,38 @@ class Query
     public function delete(): int
     {
         $this->sql = 'DELETE FROM ' . $this->sqltable;
-        if ($this->where) {
-            $this->sql .= $this->where;
+
+        if (!is_null($this->where)) {
+            $this->sql .= ' WHERE ' . $this->where;
         }
 
-        echo $this->sql . "\n";
-        print_r($this->args);
+        $pdo = ConnectionFactory::getConnection();
+        $stmt = $pdo->prepare($this->sql);
 
-        return 0;
+        try {
+            $stmt->execute($this->args);
+            return $stmt->rowCount();
+        } catch (PDOException $e) {
+            throw new PDOException("Erreur lors de l'exécution de la requête DELETE : " . $e->getMessage());
+        }
     }
 
     public function insert(array $data): int
     {
         $columns = implode(',', array_keys($data));
         $placeholders = implode(',', array_fill(0, count($data), '?'));
-        $this->sql = 'INSERT INTO ' . $this->sqltable . " ($columns) VALUES ($placeholders)";
-
+        $this->sql = "INSERT INTO {$this->sqltable} ($columns) VALUES ($placeholders)";
         $this->args = array_values($data);
 
-        echo $this->sql . "\n";
-        print_r($this->args);
+        $pdo = ConnectionFactory::getConnection();
+        $stmt = $pdo->prepare($this->sql);
 
-        // Exécution (à connecter plus tard)
-        // $stmt = $pdo->prepare($this->sql);
-        // $stmt->execute($this->args);
-        // return $stmt->rowCount(); // Nombre de lignes insérées
-        return 0;
+        try {
+            $stmt->execute($this->args);
+            return (int)$pdo->lastInsertId();
+        } catch (PDOException $e) {
+            throw new PDOException("Erreur lors de l'exécution de la requête INSERT : " . $e->getMessage());
+        }
     }
-
-
-
 }
+
