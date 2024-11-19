@@ -26,7 +26,7 @@ class Model{
 
     public function delete(){
         if ($this->atts[static::$idColumn] === null){
-            throw new HellokantException('No id set for this model');
+            throw new HellokantException();
         }
 
         return Query::table(static::$table)
