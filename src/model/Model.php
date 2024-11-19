@@ -18,6 +18,7 @@ class Model{
     public function __get(string $name): mixed{
         if (array_key_exists($name, $this->_atts))
             return $this->_atts[$name];
+        return null;
     }
 
     public function __set(string $name, mixed $val): void{
