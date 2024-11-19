@@ -1,5 +1,7 @@
 <?php
-namespace iutnc\hellokant\model;
+namespace iutnc\hellokant\entite;
+
+use iutnc\hellokant\model\Model;
 
 class Article extends Model {
     protected static $table='article';

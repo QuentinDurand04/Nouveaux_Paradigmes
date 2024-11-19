@@ -3,6 +3,7 @@
 namespace iutnc\hellokant\model;
 
 use iutnc\hellokant\query\Query;
+use iutnc\hellokant\model\HellokantException;
 
 class Model{
     protected static $table;
@@ -25,7 +26,7 @@ class Model{
 
     public function delete(){
         if ($this->atts[static::$idColumn] === null){
-            throw new \Exception('No id set for this model');
+            throw new HellokantException('No id set for this model');
         }
 
         return Query::table(static::$table)
@@ -34,8 +35,9 @@ class Model{
     }
 
     public function insert(){
-        return Query::table(static::$table)
-            ->insert($this->atts);
+        $id = Query::table(static::$table)
+        ->insert($this->atts);
+        $this->atts['id'] = $id;
     }
 
     public static function all() : array {
