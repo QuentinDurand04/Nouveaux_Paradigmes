@@ -67,4 +67,22 @@ class Model{
             ->get();
         */
     }
+
+    public function belongs_to($table, $cle){
+        $m = Query::table($this->table + ", " + $table)
+            ->where($this->table + "." + $this->idColumn, "=", $table + "." + $cle)
+            ->get();
+        return new static($m);
+    }
+
+    public function has_many($table, $cle){
+        $t = [];
+        $m = Query::table($table + ", " + $this->table) 
+            ->where($table + "." + $cle, "=", $this->table + "." + $this->idColumn)
+            ->get();
+        foreach($m as $elem){
+            $t[] = new static($elem);
+        }
+        return $t;
+    }
 }
